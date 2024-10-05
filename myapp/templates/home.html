@@ -19,16 +19,37 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
                     </li>
+                    {% if user.is_staff %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'add_book' %}">Add Book</a>
                     </li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'list_orders' %}">My Orders</a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="#">About</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -46,6 +67,9 @@
                             <th>Title</th>
                             <th>Author</th>
                             <th>Published Date</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,6 +78,11 @@
                             <td>{{ book.title }}</td>
                             <td>{{ book.author }}</td>
                             <td>{{ book.published_date }}</td>
+                            <td>${{ book.price }}</td>
+                            <td>{{ book.stock }}</td>
+                            <td>
+                                <a href="{% url 'order_book' book.id %}" class="btn btn-primary btn-sm">Order</a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
